@@ -19,6 +19,7 @@ phones = {
 }
 global_has_stock = False
 
+smtp_server = config['DEFAULT']['SMTP_Server']
 msg = EmailMessage()
 msg['Subject'] = config['DEFAULT']['Subject']
 msg['From'] = config['DEFAULT']['From']
@@ -50,6 +51,6 @@ for phone, phone_url in phones.items():
 
 if global_has_stock:
     msg.set_content(msg_text)
-    s = smtplib.SMTP('localhost')
+    s = smtplib.SMTP(smtp_server)
     s.send_message(msg)
     s.quit()
