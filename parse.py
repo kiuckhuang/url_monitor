@@ -17,6 +17,11 @@ phones = {
     "iphone13pro": 'https://shop.theclub.com.hk/iphone-13-pro.html',
     "iphone13promax": 'https://shop.theclub.com.hk/iphone13-promax.html'
 }
+
+http_headers = {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4644.0 Safari/537.36 Edg/96.0.1028.0'
+}
+
 global_has_stock = False
 
 smtp_server = config['DEFAULT']['SMTP_Server']
@@ -29,7 +34,8 @@ msg_text = ''
 
 
 for phone, phone_url in phones.items():
-    fp = urllib.request.urlopen(phone_url)
+    rq = urllib.request.Request(phone_url, headers=http_headers, method='GET')
+    fp = urllib.request.urlopen(rq)
     mybytes = fp.read()
     html = mybytes.decode("utf8")
     fp.close()
