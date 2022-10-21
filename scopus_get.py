@@ -30,7 +30,7 @@ metrics = {
 }
 
 
-print('",', '","'.join(metrics.keys()), '"')
+print('"'+'","'.join(metrics.keys())+'"')
 
 for author_id in author_ids:
     page.goto( url_prefix + author_id )
@@ -39,7 +39,7 @@ for author_id in author_ids:
     for m_key, m_selector in metrics.items():
         page.wait_for_selector(m_selector)
         lst.append(page.inner_text(m_selector))
-    print('",', '","'.join(lst), '"')
+    print('"'+'","'.join(lst)+'"')
     sleep(randint(100,200)/100)
 browser.close()
 
