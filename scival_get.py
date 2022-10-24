@@ -8,7 +8,36 @@ import os.path
 from os import path
 import math
 
+# max number of author ids
 max_per_request = 100
+
+# set the apiKey here
+url_paras = {
+    'apiKey': '7f59af901d2d86f78a1fd60c1bf9426a',
+    'indexType': 'hIndex',
+    'authors': ''
+}
+
+# set the request output to json
+request_headers = {
+    'Accept': 'application/json'
+}
+
+# search urls
+request_urls = {
+    'Academic_Corporate_Collaboration_2017-2022':'https://api.elsevier.com/analytics/scival/author/metrics?metricTypes=AcademicCorporateCollaboration&yearRange=5yrsAndCurrent&includeSelfCitations=true&byYear=false&includedDocs=AllPublicationTypes&journalImpactType=CiteScore&showAsFieldWeighted=false',
+    'Collaboration_2017-2022':'https://api.elsevier.com/analytics/scival/author/metrics?metricTypes=Collaboration&yearRange=5yrsAndCurrent&includeSelfCitations=true&byYear=false&includedDocs=AllPublicationTypes&journalImpactType=CiteScore&showAsFieldWeighted=false',
+    'Citations_Per_Publication_2017-2022':'https://api.elsevier.com/analytics/scival/author/metrics?metricTypes=CitationsPerPublication&yearRange=5yrsAndCurrent&includeSelfCitations=true&byYear=false&includedDocs=AllPublicationTypes&journalImpactType=CiteScore&showAsFieldWeighted=false',
+    'Cited_Publications_2017-2022':'https://api.elsevier.com/analytics/scival/author/metrics?metricTypes=CitedPublications&yearRange=5yrsAndCurrent&includeSelfCitations=true&byYear=false&includedDocs=AllPublicationTypes&journalImpactType=CiteScore&showAsFieldWeighted=false',
+    'Cited_Publications_all_years':'https://api.elsevier.com/analytics/scival/author/metrics?metricTypes=CitationCount&includeSelfCitations=true&byYear=false&includedDocs=AllPublicationTypes&journalImpactType=CiteScore&showAsFieldWeighted=true',
+    'Field_Weighted_Citation_Impact_2017-2022':'https://api.elsevier.com/analytics/scival/author/metrics?metricTypes=FieldWeightedCitationImpact&yearRange=5yrsAndCurrent&includeSelfCitations=true&byYear=false&includedDocs=AllPublicationTypes&journalImpactType=CiteScore&showAsFieldWeighted=true',
+    'HIndex_2017-2022':'https://api.elsevier.com/analytics/scival/author/metrics?metricTypes=HIndices&yearRange=5yrsAndCurrent&includeSelfCitations=true&byYear=false&includedDocs=AllPublicationTypes&journalImpactType=CiteScore&showAsFieldWeighted=true',
+    'HIndex_all_years':'https://api.elsevier.com/analytics/scival/author/metrics?metricTypes=HIndices&includeSelfCitations=true&byYear=false&includedDocs=AllPublicationTypes&journalImpactType=CiteScore&showAsFieldWeighted=true',
+    'ScholarlyOutput_2017-2022_by_year':'https://api.elsevier.com/analytics/scival/author/metrics?metricTypes=ScholarlyOutput&yearRange=5yrsAndCurrent&includeSelfCitations=true&byYear=true&includedDocs=AllPublicationTypes&journalImpactType=CiteScore&showAsFieldWeighted=true',
+    'ScholarlyOutput_all_years':'https://api.elsevier.com/analytics/scival/author/metrics?metricTypes=ScholarlyOutput&includeSelfCitations=true&byYear=false&includedDocs=AllPublicationTypes&journalImpactType=CiteScore&showAsFieldWeighted=true',
+    'Pubs_Top_Percentile_2017-2022':'https://api.elsevier.com/analytics/scival/author/metrics?metricTypes=PublicationsInTopJournalPercentiles&yearRange=5yrsAndCurrent&includeSelfCitations=true&byYear=false&includedDocs=AllPublicationTypes&journalImpactType=CiteScore&showAsFieldWeighted=true',
+    'Outputs_Top_Percentile_2017-2022':'https://api.elsevier.com/analytics/scival/author/metrics?metricTypes=OutputsInTopCitationPercentiles&yearRange=5yrsAndCurrent&includeSelfCitations=true&byYear=false&includedDocs=AllPublicationTypes&journalImpactType=CiteScore&showAsFieldWeighted=true'
+}
 
 def main(argv):
     inputfile = ''
@@ -44,11 +73,13 @@ def main(argv):
         index_end = (i+1) * max_per_request
         if index_end > len(lines):
            index_end = len(lines) 
-        print(str(index_start) + ":" + str(index_end))
-        print(lines[index_start:index_end])
-    #url_source = 'https://services.nvd.nist.gov/rest/json/cves/2.0'
-    #cves = json.loads(requests.get(url_source).text)
-    #print(cves["resultsPerPage"], cves['timestamp']);
+        #print(str(index_start) + ":" + str(index_end))
+        url_paras['authors'] = ','.join(lines[index_start:index_end])
+        p = requests.models.PreparedRequest()
+        p.prepare_url(url=request_urls['Academic_Corporate_Collaboration_2017-2022'], params=url_paras)
+        print(p.url)
+        output = json.loads(requests.get(p.url, headers=request_headers).text)
+        print(output);
 
 
 
