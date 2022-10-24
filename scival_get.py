@@ -15,6 +15,7 @@ max_per_request = 100
 url_paras = {
     'apiKey': '7f59af901d2d86f78a1fd60c1bf9426a',
     'indexType': 'hIndex',
+    'httpAccept': 'application/json',
     'authors': ''
 }
 
@@ -77,9 +78,9 @@ def main(argv):
         url_paras['authors'] = ','.join(lines[index_start:index_end])
         p = requests.models.PreparedRequest()
         p.prepare_url(url=request_urls['Academic_Corporate_Collaboration_2017-2022'], params=url_paras)
-        print(p.url)
-        output = json.loads(requests.get(p.url, headers=request_headers).text)
-        print(output);
+        #print(p.url)
+        json_dict = json.loads(requests.get(p.url, headers=request_headers).text)
+        print(json_dict['results'][0]['author']['name']);
 
 
 
