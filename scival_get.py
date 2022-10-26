@@ -7,6 +7,8 @@ import sys, getopt
 import os.path
 from os import path
 import math
+import pandas as pd
+
 
 # max number of author ids
 max_per_request = 100
@@ -67,7 +69,7 @@ def main(argv):
 
     lines = []
     with open(inputfile) as f:
-        lines = f.read().splitlines()
+        lines = f.read().splitlines()[0:2]
 
     for i in range(0, math.floor( len(lines) / max_per_request) + 1 ):
         index_start = i * max_per_request
@@ -77,10 +79,12 @@ def main(argv):
         #print(str(index_start) + ":" + str(index_end))
         url_paras['authors'] = ','.join(lines[index_start:index_end])
         p = requests.models.PreparedRequest()
-        p.prepare_url(url=request_urls['Academic_Corporate_Collaboration_2017-2022'], params=url_paras)
-        #print(p.url)
-        json_dict = json.loads(requests.get(p.url, headers=request_headers).text)
-        print(json_dict['results'][0]['author']['name']);
+        for myname, url_prefix in request_urls.items():
+            p.prepare_url(url=url_prefix, params=url_paras)
+            #print(p.url)
+            json_dict = json.loads(requests.get(p.url, headers=request_headers).text)
+            #print(pd.json_normalize(json_dict['results'][0]['author']['name']))
+            print(pd.json_normalize(json_dict['results']))
 
 
 
