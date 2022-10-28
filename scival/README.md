@@ -16,7 +16,7 @@ pip install -i requirements.txt
 python scival_download.py -i scival_ids.txt -o scival_out.csv
 
 ```
-    - `scival_ids.txt` contains the scival author id
-    - `scival_out.csv` file will be saved after fetch api output, in CSV format
+    `scival_ids.txt` contains the scival author id
+    `scival_out.csv` file will be saved after fetch api output, in CSV format
 
 - Use Excel to open the `scival_out.csv` file
