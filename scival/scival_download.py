@@ -2,7 +2,6 @@
 
 import requests
 import json
-import re
 import sys, getopt
 import os.path
 from os import path
@@ -101,11 +100,10 @@ def main(argv):
             #print(json_metric)
         
         json_metric = json_metric.drop(['author.link.@ref', 'author.link.@href', 'author.link.@type', 'author.uri'], axis=1)
-        json_metric.columns = [myname, 'author.id', 'author.name']
+        json_metric.columns = [myname, 'author.name', 'author.id']
         json_metric = json_metric[['author.id', 'author.name', myname]]
         #print(json_metric)
         json_metric.set_index('author.id')
-        print(json_all.size)
         if json_all.size == 0:
             json_all = json_metric
         else:
