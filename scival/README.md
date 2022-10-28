@@ -18,3 +18,6 @@ python scival_download.py -i scival_ids.txt -o scival_out.json
 
 - Upload the "scival_out.json" to convert to Excel:
 https://www.convertcsv.com/json-to-csv.htm
+
+    -- Steps to convert from Json file to Excel
+    ![Alt text](convertcsv.jpg?raw=true "ConvertCSV")
