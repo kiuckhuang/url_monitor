@@ -1,8 +1,5 @@
 #!/usr/bin/python3
 
-from asyncio.events import _ExceptionHandler
-from distutils import errors
-from distutils.log import error
 import requests
 import json
 import re
@@ -10,6 +7,8 @@ import sys, getopt
 import os.path
 from os import path
 import math
+from time import sleep
+from random import randint
 import pandas as pd
 
 
@@ -45,10 +44,11 @@ request_urls = {
     'Outputs_Top_Percentile_2017-2022':'https://api.elsevier.com/analytics/scival/author/metrics?metricTypes=OutputsInTopCitationPercentiles&yearRange=5yrsAndCurrent&includeSelfCitations=true&byYear=false&includedDocs=AllPublicationTypes&journalImpactType=CiteScore&showAsFieldWeighted=true'
 }
 
-# search urls
-request_urls = {
-    'Academic_Corporate_Collaboration_2017-2022':'https://kiu.cpeg.net/tmp/api/'
-}
+# testing for 1 url
+#request_urls = {
+#    'Pubs_Top_Percentile_2017-2022':'https://api.elsevier.com/analytics/scival/author/metrics?metricTypes=PublicationsInTopJournalPercentiles&yearRange=5yrsAndCurrent&includeSelfCitations=true&byYear=false&includedDocs=AllPublicationTypes&journalImpactType=CiteScore&showAsFieldWeighted=true',
+#    'Outputs_Top_Percentile_2017-2022':'https://api.elsevier.com/analytics/scival/author/metrics?metricTypes=OutputsInTopCitationPercentiles&yearRange=5yrsAndCurrent&includeSelfCitations=true&byYear=false&includedDocs=AllPublicationTypes&journalImpactType=CiteScore&showAsFieldWeighted=true'
+#}
 
 def main(argv):
     inputfile = ''
@@ -79,33 +79,45 @@ def main(argv):
     with open(inputfile) as f:
         lines = f.read().splitlines()
 
-    for i in range(0, math.floor( len(lines) / max_per_request) + 1 ):
-        index_start = i * max_per_request
-        index_end = (i+1) * max_per_request
-        if index_end > len(lines):
-           index_end = len(lines) 
-        #print(str(index_start) + ":" + str(index_end))
-        url_paras['authors'] = ','.join(lines[index_start:index_end])
-        p = requests.models.PreparedRequest()
-        df_all = pd.DataFrame()
-        for myname, url_prefix in request_urls.items():
-            url_prefix = url_prefix + str(i) + '.json'
+    json_all = pd.DataFrame()
+    for myname, url_prefix in request_urls.items():
+        json_metric = pd.DataFrame()
+        
+        for i in range(0, math.floor( len(lines) / max_per_request) + 1 ):
+            index_start = i * max_per_request
+            index_end = (i+1) * max_per_request
+            if index_end > len(lines):
+                index_end = len(lines) 
+
+            #print(str(index_start) + ":" + str(index_end))
+            url_paras['authors'] = ','.join(lines[index_start:index_end])
+            p = requests.models.PreparedRequest()
+
             p.prepare_url(url=url_prefix, params=url_paras)
-            print(p.url)
+            #print(p.url)
             json_dict = json.loads(requests.get(p.url, headers=request_headers).text)
-            df_out = pd.read_json("0.json", errors='ignore')
-            #df_out = pd.json_normalize(json_dict['results'], record_path =['metrics'], meta=[["author", "id"], ["author", "name"]], sep='.', errors='ingore')
-            #tmp1 = 0
-            #for mystr in df_out['values'].values[0]:         
-            #    if tmp1 == 0:
-            #        print(mystr)
-            #        tmp1 = tmp1+1
-            if(i==0):
-                df_out.to_csv(outputfile, mode='w', index=False)
-            else:
-                df_out.to_csv(outputfile, mode='a', index=False, header=not os.path.exists(outputfile))
-            #pd.concat(df1, pd.json_normalize(json_dict['results']))
-            #print(pd.json_normalize(json_dict['results'][0]['author']['name']))
+            json_results = pd.json_normalize(json_dict['results'])
+            json_metric = pd.concat([json_metric, json_results], axis=0, ignore_index=True)
+            #print(json_metric)
+        
+        json_metric = json_metric.drop(['author.link.@ref', 'author.link.@href', 'author.link.@type', 'author.uri'], axis=1)
+        json_metric.columns = [myname, 'author.id', 'author.name']
+        json_metric = json_metric[['author.id', 'author.name', myname]]
+        #print(json_metric)
+        json_metric.set_index('author.id')
+        print(json_all.size)
+        if json_all.size == 0:
+            json_all = json_metric
+        else:
+            json_all= json_all.merge(json_metric, how='left', on=['author.id', 'author.name'])
+        #print(json_all)
+        sleep(randint(100,200)/100)
+
+    #print(json_all)
+    with open(outputfile, 'w') as ofile:
+        result = json_all.to_json(orient="table", index=False)
+        json.dump(json.loads(result), ofile, indent=4)
+        print('Saved to:', outputfile)
 
 
 if __name__ == "__main__":
