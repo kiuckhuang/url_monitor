@@ -13,11 +13,10 @@ pip install -i requirements.txt
 
 - Run the script with following syntax
 ```
-python scival_download.py -i scival_ids.txt -o scival_out.json
+python scival_download.py -i scival_ids.txt -o scival_out.csv
+
 ```
+    - `scival_ids.txt` contains the scival author id
+    - `scival_out.csv` file will be saved after fetch api output, in CSV format
 
-- Upload the "scival_out.json" to convert to Excel:
-https://www.convertcsv.com/json-to-csv.htm
-
-    Steps to convert from Json file to Excel
-    ![Alt text](convertcsv.jpg?raw=true "ConvertCSV")
+- Use Excel to open the `scival_out.csv` file

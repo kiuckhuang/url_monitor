@@ -9,6 +9,7 @@ import math
 from time import sleep
 from random import randint
 import pandas as pd
+from flatten_json import flatten
 
 
 # max number of author ids
@@ -112,10 +113,11 @@ def main(argv):
         sleep(randint(100,200)/100)
 
     #print(json_all)
-    with open(outputfile, 'w') as ofile:
-        result = json_all.to_json(orient="table", index=False)
-        json.dump(json.loads(result), ofile, indent=4)
-        print('Saved to:', outputfile)
+    dic_all = json_all.to_dict(orient='records')
+    dic_flattened = [flatten(d) for d in dic_all]
+    df = pd.DataFrame(dic_flattened)
+    df.to_csv(outputfile, index=False)
+    print('Saved to:', outputfile)
 
 
 if __name__ == "__main__":
